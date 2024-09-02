@@ -15,57 +15,47 @@ section {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 1;
+  width: 100%;
   min-height: 100vh;
-  background: -webkit-radial-gradient(
-      32% 106%,
-      circle cover,
-      rgb(255, 225, 125) 0%,
-      rgb(255, 205, 105) 10%,
-      rgb(250, 145, 55) 28%,
-      rgb(235, 65, 65) 42%,
-      transparent 82%
-    ),
-    -webkit-linear-gradient(-45deg, rgb(35, 75, 215) 12%, rgb(195, 60, 190) 58%);
-  background: -moz-radial-gradient(
-      32% 106%,
-      circle cover,
-      rgb(255, 225, 125) 0%,
-      rgb(255, 205, 105) 10%,
-      rgb(250, 145, 55) 28%,
-      rgb(235, 65, 65) 42%,
-      transparent 82%
-    ),
-    -moz-linear-gradient(-45deg, rgb(35, 75, 215) 12%, rgb(195, 60, 190) 58%);
-  background: -ms-radial-gradient(
-      32% 106%,
-      circle cover,
-      rgb(255, 225, 125) 0%,
-      rgb(255, 205, 105) 10%,
-      rgb(250, 145, 55) 28%,
-      rgb(235, 65, 65) 42%,
-      transparent 82%
-    ),
-    -ms-linear-gradient(-45deg, rgb(35, 75, 215) 12%, rgb(195, 60, 190) 58%);
-  background: -o-radial-gradient(
-      32% 106%,
-      circle cover,
-      rgb(255, 225, 125) 0%,
-      rgb(255, 205, 105) 10%,
-      rgb(250, 145, 55) 28%,
-      rgb(235, 65, 65) 42%,
-      transparent 82%
-    ),
-    -o-linear-gradient(-45deg, rgb(35, 75, 215) 12%, rgb(195, 60, 190) 58%);
-  background: radial-gradient(
-      circle farthest-corner at 32% 106%,
-      rgb(255, 225, 125) 0%,
-      rgb(255, 205, 105) 10%,
-      rgb(250, 145, 55) 28%,
-      rgb(235, 65, 65) 42%,
-      transparent 82%
-    ),
-    linear-gradient(135deg, rgb(35, 75, 215) 12%, rgb(195, 60, 190) 58%);
+  background: url("../accets/backgroud-login.jpg") no-repeat;
+  background-size: cover;
+  background-position: center;
+  animation: animateBackground 10s linear infinite;
+}
+
+.home-section {
+  flex-direction: column;
+  gap: 15px;
+  background: url("../accets/backgroud-home.jpg") no-repeat;
+  background-size: cover;
+  background-position: 70% 50%;
+  animation: none !important;
+  h2 {
+    font-size: 1em !important;
+  }
+  img {
+    width: 50px;
+    filter: drop-shadow(0 0 1px #fff);
+  }
+}
+
+.hero-from {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 1.5em;
+}
+
+@keyframes animateBackground {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
 }
 
 .login-box {
@@ -73,15 +63,27 @@ section {
   width: 380px;
   height: 420px;
   background: transparent;
-  backdrop-filter: blur(50px);
+  backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
+  border-radius: 12px;
   display: flex;
+  flex-direction: column;
+  gap: 15px;
   justify-content: center;
   align-items: center;
   -webkit-animation: slide-in-bottom 1s 0.5s
     cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
   animation: slide-in-bottom 1s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+
+  .icon-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5em;
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+  }
 
   h2 {
     color: #fff;
@@ -185,6 +187,141 @@ section {
       }
     }
   }
+}
+
+.login-box-home {
+  animation: none !important;
+}
+
+.alert {
+  position: absolute;
+  bottom: -60px;
+  padding: 2px 10px;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  list-style: none;
+}
+.alert-heading {
+  color: inherit;
+}
+.alert-link {
+  font-weight: 700;
+}
+.alert-dismissible {
+  padding-right: 3rem;
+}
+.alert-dismissible .btn-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  padding: 1.25rem 1rem;
+}
+.alert-primary {
+  color: #084298;
+  background-color: #cfe2ff;
+  border-color: #b6d4fe;
+}
+.alert-primary .alert-link {
+  color: #06357a;
+}
+.alert-secondary {
+  color: #41464b;
+  background-color: #e2e3e5;
+  border-color: #d3d6d8;
+}
+.alert-secondary .alert-link {
+  color: #34383c;
+}
+.alert-success {
+  color: #0f5132;
+  background-color: #d1e7dd;
+  border-color: #badbcc;
+}
+.alert-success .alert-link {
+  color: #0c4128;
+}
+.alert-info {
+  color: #055160;
+  background-color: #cff4fc;
+  border-color: #b6effb;
+}
+.alert-info .alert-link {
+  color: #04414d;
+}
+.alert-warning {
+  color: #664d03;
+  background-color: #fff3cd;
+  border-color: #ffecb5;
+}
+.alert-warning .alert-link {
+  color: #523e02;
+}
+.alert-danger {
+  color: #842029;
+  background-color: #f8d7da;
+  border-color: #f5c2c7;
+}
+.alert-danger .alert-link {
+  color: #6a1a21;
+}
+.alert-light {
+  color: #636464;
+  background-color: #fefefe;
+  border-color: #fdfdfe;
+}
+.alert-light .alert-link {
+  color: #4f5050;
+}
+.alert-dark {
+  color: #141619;
+  background-color: #d3d3d4;
+  border-color: #bcbebf;
+}
+.alert-dark .alert-link {
+  color: #101214;
+}
+
+.results {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .tables-results {
+    width: 100%;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: center;
+  }
+}
+
+table {
+  caption-side: bottom;
+  border-collapse: collapse;
+}
+caption {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  color: #6c757d;
+  text-align: left;
+}
+th {
+  text-align: inherit;
+  text-align: -webkit-match-parent;
+}
+tbody,
+td,
+tfoot,
+th,
+thead,
+tr {
+  border-color: inherit;
+  border-style: solid;
+  border-width: 0;
 }
 
 @-webkit-keyframes slide-in-bottom {
