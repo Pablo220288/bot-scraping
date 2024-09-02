@@ -20,6 +20,8 @@ ALLOWED_HOSTS = [".vercel.app", "127.0.0.1"]
 # Application definition
 
 INSTALLED_APPS = [
+    # Django Admin Interface
+    "admin_interface",
     # Alfortino apps
     "bot",
     # Django apps
@@ -29,6 +31,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Django Themes Admin
+    "colorfield",
 ]
 
 MIDDLEWARE = [

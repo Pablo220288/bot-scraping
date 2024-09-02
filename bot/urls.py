@@ -5,4 +5,6 @@ from bot.views import *
 
 urlpatterns = [
     path("", index, name="index"),
+    path("home/", home, name="home"),
+    path("logout/", logout_view, name="logout"),
 ]

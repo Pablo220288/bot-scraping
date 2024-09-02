@@ -1,0 +1,77 @@
+{% extends 'index.html' %} 
+
+{% block static %} 
+    {% load static %} 
+{% endblock static %} 
+
+{% block titleanddescription %}
+<title>Al Fortino Instagram Bot</title>
+<meta name="description" content="" />
+{% endblock titleanddescription %} 
+
+{% block content %}
+<section class="home-section">
+  <div class="login-box login-box-home">
+    {% if messages %} 
+        {% for message in messages %}
+            <li {% if message.tags %} class="alert alert-{{message.tags}}" {% endif %}>
+              {{message}}
+            </li>
+        {% endfor %}
+    {% endif %}
+
+    <a class="icon-close"  href="{% url 'logout' %}">
+        <ion-icon  name="close"></ion-icon>
+    </a>
+
+    <form class="form-home" method="post">
+      {% csrf_token %}
+      <div class="hero-from">
+        <img src="{% static 'accets/favicon.png' %}" alt="InstaBot" />
+        <h2>Instagram</h2>
+      </div>
+      <div class="input-box">
+        <span class="icon"><ion-icon name="mail"></ion-icon></span>
+        <input type="text" name="user" required />
+        <label for="">User Instagram</label>
+      </div>
+      <div class="input-box">
+        <span class="icon"><ion-icon name="key"></ion-icon></span>
+        <input type="password" name="password" required />
+        <label for="">Password Instagram</label>
+      </div>
+      <button type="submit">Check Matches</button>
+    </form>
+  </div>
+
+  <div class="results">
+    <h3>Results</h3>
+    <div class="tables-results">
+        <table class="table site-block-order-table mb-5">
+            <thead>
+              <th>Match</th>
+            </thead>
+            <tbody>
+                {% for match in coinciden %}
+                <tr>
+                    <td>{{match}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+        <table class="table site-block-order-table mb-5">
+            <thead>
+              <th>No Match</th>
+            </thead>
+            <tbody>
+                {% for noMatch in no_coinciden %}
+                <tr>
+                    <td>{{noMatch}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+    </div>
+  </div>
+</section>
+{% endblock content %}
