@@ -71,7 +71,7 @@ def home(request):
         chrome_options.add_experimental_option("useAutomationExtension", False)
 
         # Configuración del servicio de ChromeDriver
-        service = Service()
+        service = Service(executable_path=PATH)
 
         # Inicializa el driver de Chrome con el servicio configurado
         driver = webdriver.Chrome(service=service, options=chrome_options)
