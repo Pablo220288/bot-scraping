@@ -61,7 +61,7 @@ def home(request):
         INSTAGRAM_PASSWORD = os.getenv("INSTAGRAM_PASSWORD") """
 
         # Ruta al ChromeDriver (con extensión .exe en Windows)
-        PATH = "C:/Program Files/chromedriver.exe"
+        PATH = "C:/webdrivers/chromedriver.exe"
 
         chrome_options = Options()
         chrome_options.add_argument(
