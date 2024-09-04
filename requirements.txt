@@ -23,7 +23,7 @@ mdurl==0.1.2
 numpy==2.1.0
 outcome==1.3.0.post0
 pillow==10.3.0
-psycopg2==2.9.9
+psycopg2-binary==2.9.9
 pycparser==2.22
 Pygments==2.18.0
 PySocks==1.7.1
