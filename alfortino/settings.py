@@ -71,10 +71,14 @@ WSGI_APPLICATION = "alfortino.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "alfortino.db",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "alfortinodb",
+        "USER": "postgres",
+        "PASSWORD": "melyypablo7sep",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
-}
+} 
 
 
 # Password validation
