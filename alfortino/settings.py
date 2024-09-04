@@ -71,12 +71,12 @@ WSGI_APPLICATION = "alfortino.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "alfortinodb",
-        "USER": "postgres",
-        "PASSWORD": "melyypablo7sep",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "postgres",
+        "USER": "postgres.xkscoxyfsohdbcugjbhc",
+        "PASSWORD": "a1b2c3d4e5f6g7h8i9j0",
+        "HOST": "aws-0-sa-east-1.pooler.supabase.com",
+        "PORT": "6543",
     }
 } 
 
