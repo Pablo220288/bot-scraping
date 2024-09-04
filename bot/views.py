@@ -71,7 +71,7 @@ def home(request):
         chrome_options.add_experimental_option("useAutomationExtension", False)
 
         # Configuración del servicio de ChromeDriver
-        service = Service(PATH)
+        service = Service()
 
         # Inicializa el driver de Chrome con el servicio configurado
         driver = webdriver.Chrome(service=service, options=chrome_options)
@@ -286,6 +286,13 @@ def home(request):
         # Cerrar el navegador
         driver.quit()
 
-        return render(request, "home.html", {"coinciden": results["coinciden"], "no_coinciden": results["no_coinciden"]})
+        return render(
+            request,
+            "home.html",
+            {
+                "coinciden": results["coinciden"],
+                "no_coinciden": results["no_coinciden"],
+            },
+        )
 
     return render(request, "home.html")
