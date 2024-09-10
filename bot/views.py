@@ -9,6 +9,7 @@ import numpy as np
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import FileSystemStorage
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from PIL import Image
@@ -48,20 +49,40 @@ def logout_view(request):
     return redirect(reverse_lazy("index"))
 
 
-@login_required
+""" @login_required """
+
+
 def home(request):
-    print(request.method)
-    print(request.method)
     if request.method == "POST":
         # Variables de entorno
         INSTAGRAM_USER = request.POST.get("user")
         INSTAGRAM_PASSWORD = request.POST.get("password")
+        TYPE_MATCH = request.POST.get("type-match")
+        FILE = request.FILES.get("my_file")
+        USERSTOTEST = request.POST.get("usersToTest")
+
+        print(USERSTOTEST)
+        print(FILE)
+
+        if FILE:
+            # Configura la ruta donde se guardará el archivo
+            fs = FileSystemStorage()
+            ruta_guardado = os.path.join('test', FILE.name)  # Carpeta 'test' en MEDIA_ROOT
+            
+            # Guardar el archivo en la carpeta 'test'
+            nombre_archivo = fs.save(ruta_guardado, FILE)
+            
+            # Obtener la ruta completa del archivo guardado
+            ruta_completa = fs.url(nombre_archivo)
+            
+            # Imprimir la ruta completa para verificar
+            print(f'Archivo guardado en: {ruta_completa}')
 
         """ INSTAGRAM_USER = os.getenv("INSTAGRAM_USER")
         INSTAGRAM_PASSWORD = os.getenv("INSTAGRAM_PASSWORD") """
 
         # Ruta al ChromeDriver (con extensión .exe en Windows)
-        PATH = "C:/webdrivers/chromedriver.exe"
+        PATH = "chromedriver/chromedriver.exe"
 
         chrome_options = Options()
         chrome_options.add_argument(
@@ -133,7 +154,9 @@ def home(request):
             print("Inicio de sesión manual completado y cookies guardadas.")
 
         # Buscador
-        usuarios = ["mariapombo", "luisinhaoliveira99"]
+        usuarios = USERSTOTEST.split(',')
+        usuarios = [usuario.strip() for usuario in usuarios]
+        """ usuarios = ["mariapombo", "luisinhaoliveira99"] """
 
         def download_image(src, usuario, folder="historias"):
             if not os.path.exists(folder):
@@ -145,9 +168,7 @@ def home(request):
 
         def compare_images(image):
             # Cargar las imágenes
-            print("aqui")
-            img1 = Image.open("test.jpg")
-            print(img1)
+            img1 = Image.open(f"test/{FILE.name}")	
             img2 = Image.open(image)
             # Convertir imágenes a matrices numpy
             np_img1 = np.array(img1)
@@ -278,6 +299,11 @@ def home(request):
 
         print("Usuarios con historias coincidentes:", results["coinciden"])
         print("Usuarios sin historias coincidentes:", results["no_coinciden"])
+
+        # Eliminar la imagen de prueba
+        print("Eliminando imagen de prueba...")
+        os.remove("test/test.jpg")
+
         print("Fin del Programa")
 
         # Espera un tiempo aleatorio antes de cerrar el navegador
@@ -290,6 +316,7 @@ def home(request):
             request,
             "home.html",
             {
+                "results": results,
                 "coinciden": results["coinciden"],
                 "no_coinciden": results["no_coinciden"],
             },

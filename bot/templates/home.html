@@ -24,7 +24,7 @@
         <ion-icon  name="close"></ion-icon>
     </a>
 
-    <form class="form-home" method="post">
+    <form class="form-home" method="post" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="hero-from">
         <img src="{% static 'accets/favicon.png' %}" alt="InstaBot" />
@@ -40,38 +40,52 @@
         <input type="password" name="password" required />
         <label for="">Password Instagram</label>
       </div>
+      <div class="check-home">
+        <label><input type="radio" name="type-match" value="image" checked />Image</label>
+        <label><input type="radio" name="type-match" value="video" disabled/>Video</label>
+      </div>
+      <div class="input-file-container">  
+        <input class="input-file" id="my-file" name="my_file" type="file">
+        <label tabindex="0" for="my-file" class="input-file-trigger">Select a file...</label>
+      </div>
+      <p class="file-return"></p>
+      <div class="textarea-box">
+        <textarea name="usersToTest" required placeholder="Place the users to be checked separated by commas...." tabindex="5"></textarea>
+      </div>
       <button type="submit">Check Matches</button>
     </form>
   </div>
 
-  <div class="results">
-    <h3>Results</h3>
-    <div class="tables-results">
-        <table class="table site-block-order-table mb-5">
-            <thead>
-              <th>Match</th>
-            </thead>
-            <tbody>
-                {% for match in coinciden %}
-                <tr>
-                    <td>{{match}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-          </table>
-        <table class="table site-block-order-table mb-5">
-            <thead>
-              <th>No Match</th>
-            </thead>
-            <tbody>
-                {% for noMatch in no_coinciden %}
-                <tr>
-                    <td>{{noMatch}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-          </table>
+  {% if results %}
+    <div class="results">
+      <h3>Results</h3>
+      <div class="tables-results">
+          <table class="table site-block-order-table mb-5">
+              <thead>
+                <th>Match</th>
+              </thead>
+              <tbody>
+                  {% for match in coinciden %}
+                  <tr>
+                      <td>{{match}}</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+            </table>
+          <table class="table site-block-order-table mb-5">
+              <thead>
+                <th>No Match</th>
+              </thead>
+              <tbody>
+                  {% for noMatch in no_coinciden %}
+                  <tr>
+                      <td>{{noMatch}}</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+            </table>
+      </div>
     </div>
-  </div>
+  {% endif %}
 </section>
 {% endblock content %}
