@@ -97,7 +97,7 @@ def home(request):
         password_input.send_keys(Keys.RETURN)
 
         # Esperar hasta que la sesión haya iniciado
-        time.sleep(random.uniform(2, 5))
+        time.sleep(random.uniform(5, 10))
 
         # Buscador
         usuarios = USERSTOTEST.split(",")

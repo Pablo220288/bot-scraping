@@ -14,7 +14,7 @@ SECRET_KEY = "django-insecure-ocw9mo26yl#7bp-le_^tnsi=+k%8+#kp@zzhtbg3g98u7c66-q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [".vercel.app", "127.0.0.1"]
+ALLOWED_HOSTS = [".onrender.com", ".vercel.app", "127.0.0.1"]
 
 
 # Application definition
@@ -78,7 +78,7 @@ DATABASES = {
         "HOST": "aws-0-sa-east-1.pooler.supabase.com",
         "PORT": "6543",
     }
-} 
+}
 
 
 # Password validation
