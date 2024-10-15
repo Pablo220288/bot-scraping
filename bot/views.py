@@ -19,6 +19,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
 
 # Create your views here.
 
@@ -79,7 +80,10 @@ def home(request):
         service = Service(executable_path=PATH)
 
         # Inicializa el driver de Chrome con el servicio configurado
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver = webdriver.Chrome(
+            service=Service(ChromeDriverManager().install()), 
+            options=chrome_options
+        )
 
         # Abre Instagram
         driver.get("https://www.instagram.com/")
