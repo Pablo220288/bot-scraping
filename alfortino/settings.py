@@ -16,6 +16,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = [".onrender.com", ".vercel.app", "127.0.0.1"]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://bot-scraping-i2yh.onrender.com",
+    "https://*.onrender.com",
+]
 
 # Application definition
 
