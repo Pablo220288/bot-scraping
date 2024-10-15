@@ -1,11 +1,10 @@
-import os
-import pickle
+import io
 import random
 import ssl
 import time
-import urllib.request
 
 import numpy as np
+import requests
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -61,25 +60,10 @@ def home(request):
         FILE = request.FILES.get("my_file")
         USERSTOTEST = request.POST.get("usersToTest")
 
-        print(USERSTOTEST)
-        print(FILE)
-
         if FILE:
-            # Configura la ruta donde se guardará el archivo
-            fs = FileSystemStorage()
-            ruta_guardado = os.path.join('test', FILE.name)  # Carpeta 'test' en MEDIA_ROOT
-            
-            # Guardar el archivo en la carpeta 'test'
-            nombre_archivo = fs.save(ruta_guardado, FILE)
-            
-            # Obtener la ruta completa del archivo guardado
-            ruta_completa = fs.url(nombre_archivo)
-            
-            # Imprimir la ruta completa para verificar
-            print(f'Archivo guardado en: {ruta_completa}')
-
-        """ INSTAGRAM_USER = os.getenv("INSTAGRAM_USER")
-        INSTAGRAM_PASSWORD = os.getenv("INSTAGRAM_PASSWORD") """
+            # Guardar la imagen de prueba en memoria
+            test_image_bytes = io.BytesIO(FILE.read())
+            print(f"Imagen de prueba cargada en memoria.")
 
         # Ruta al ChromeDriver (con extensión .exe en Windows)
         PATH = "chromedriver/chromedriver.exe"
@@ -102,80 +86,40 @@ def home(request):
 
         ssl._create_default_https_context = ssl._create_unverified_context
 
-        # Función para guardar cookies
-        def save_cookies(driver, filepath):
-            with open(filepath, "wb") as file:
-                pickle.dump(driver.get_cookies(), file)
+        # Realiza el proceso de inicio de sesión manual
+        username_input = WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.NAME, "username"))
+        )
+        password_input = driver.find_element(By.NAME, "password")
 
-        # Función para cargar cookies
-        def load_cookies(driver, filepath):
-            with open(filepath, "rb") as file:
-                cookies = pickle.load(file)
-                for cookie in cookies:
-                    driver.add_cookie(cookie)
+        username_input.send_keys(INSTAGRAM_USER)
+        password_input.send_keys(INSTAGRAM_PASSWORD)
+        password_input.send_keys(Keys.RETURN)
 
-        # Ruta donde se guardarán las cookies
-        cookies_path = "cookies.pkl"
-
-        # Login
-        # Si el archivo de cookies existe, cargamos las cookies
-        if os.path.exists(cookies_path):
-            load_cookies(driver, cookies_path)
-            driver.refresh()
-            time.sleep(random.uniform(1, 3))
-
-            # Verificamos si la sesión está activa
-            try:
-                driver.find_element(By.XPATH, "//div[text()='Home']")
-                print("Inicio de sesión con cookies exitoso.")
-            except:
-                print(
-                    "No se pudo iniciar sesión con cookies. Procediendo con inicio de sesión manual."
-                )
-                os.remove(cookies_path)  # Elimina cookies si fallan
-
-        else:
-            # Realiza el proceso de inicio de sesión manual
-            username_input = WebDriverWait(driver, 20).until(
-                EC.presence_of_element_located((By.NAME, "username"))
-            )
-            password_input = driver.find_element(By.NAME, "password")
-
-            username_input.send_keys(INSTAGRAM_USER)
-            password_input.send_keys(INSTAGRAM_PASSWORD)
-            password_input.send_keys(Keys.RETURN)
-
-            # Esperar hasta que la sesión haya iniciado
-            time.sleep(random.uniform(5, 10))
-
-            # Guarda las cookies después de iniciar sesión
-            save_cookies(driver, cookies_path)
-
-            print("Inicio de sesión manual completado y cookies guardadas.")
+        # Esperar hasta que la sesión haya iniciado
+        time.sleep(random.uniform(2, 5))
 
         # Buscador
-        usuarios = USERSTOTEST.split(',')
+        usuarios = USERSTOTEST.split(",")
         usuarios = [usuario.strip() for usuario in usuarios]
-        """ usuarios = ["mariapombo", "luisinhaoliveira99"] """
 
-        def download_image(src, usuario, folder="historias"):
-            if not os.path.exists(folder):
-                os.makedirs(folder)
-            file_name = f"{folder}/{usuario}_{int(time.time())}.jpg"
-            urllib.request.urlretrieve(src, file_name)
-            print(f"Imagen descargada: {file_name}")
-            return file_name
+        def download_image_to_memory(src):
+            response = requests.get(src)
+            image_bytes = io.BytesIO(response.content)
+            print(f"Imagen descargada en memoria.")
+            return image_bytes
 
-        def compare_images(image):
-            # Cargar las imágenes
-            img1 = Image.open(f"test/{FILE.name}")	
-            img2 = Image.open(image)
-            # Convertir imágenes a matrices numpy
-            np_img1 = np.array(img1)
-            np_img2 = np.array(img2)
+        def compare_images(image_bytes):
+            # Cargar las imágenes desde la memoria
+            test_image = Image.open(test_image_bytes)
+            img_to_compare = Image.open(image_bytes)
+
+            # Convertir las imágenes a arrays numpy
+            np_test_image = np.array(test_image)
+            np_img_to_compare = np.array(img_to_compare)
 
             # Comparar las matrices
-            if np.array_equal(np_img1, np_img2):
+            if np.array_equal(np_test_image, np_img_to_compare):
                 print("Las imágenes son iguales.")
                 return True
             else:
@@ -193,7 +137,6 @@ def home(request):
             time.sleep(random.uniform(1, 3))
 
             try:
-                # Hacemos click en las historias del Usuario
                 historia = WebDriverWait(driver, 20).until(
                     EC.presence_of_element_located(
                         (By.XPATH, "//div[@role='button']//span[@role='link']")
@@ -201,14 +144,10 @@ def home(request):
                 )
                 historia.click()
 
-                # Esperamos un tiempo aleatorio para imitar el comportamiento humano
                 time.sleep(random.uniform(1, 3))
-
-                historias = []
 
                 while True:
                     try:
-                        # Buscar el contenedor principal
                         div_container = WebDriverWait(driver, 10).until(
                             EC.presence_of_element_located(
                                 (
@@ -234,54 +173,41 @@ def home(request):
                             img = div_container.find_element(By.CSS_SELECTOR, "img")
                             src = img.get_attribute("src")
                             print(f"Imagen encontrada: {src}")
-                            image_path = download_image(
-                                src, usuario
-                            )  # Descargar la imagen
+                            image_bytes = download_image_to_memory(src)
 
-                            # Comparar la imagen descargada con la imagen test
-                            if compare_images(image_path):
-                                # Si las imágenes son iguales, pasar al siguiente usuario
+                            if compare_images(image_bytes):
                                 print(
                                     "Las imágenes son iguales, pasando al siguiente usuario."
                                 )
                                 results["coinciden"].append(usuario)
-                                os.remove(image_path)
-                                return  # Pasamos al siguiente usuario
+                                return
                             else:
                                 print(
                                     "Las imágenes son diferentes, continuando con la siguiente historia."
                                 )
-                                os.remove(image_path)
 
                         except:
-                            # Si no es una imagen, intentar buscar un video
                             try:
                                 video = div_container.find_element(
                                     By.CSS_SELECTOR, "video"
                                 )
-                                print("Es un video pasamos a la siguiente historia...")
+                                print("Es un video, pasamos a la siguiente historia...")
                             except:
                                 print("No se encontró ni imagen ni video.")
 
-                        # Intentar hacer clic en el botón "Siguiente"
                         try:
                             svg_next_button = WebDriverWait(driver, 10).until(
                                 EC.presence_of_element_located(
-                                    (
-                                        By.CSS_SELECTOR,
-                                        "svg[aria-label='Siguiente']",
-                                    )
+                                    (By.CSS_SELECTOR, "svg[aria-label='Siguiente']")
                                 )
                             )
                             next_button = svg_next_button.find_element(By.XPATH, "./..")
                             next_button.click()
                             print("Pasando a la siguiente historia...")
-                        except Exception as e:
-                            print(f"No se pudo hacer clic en el botón 'Siguiente'")
+                        except:
                             results["no_coinciden"].append(usuario)
                             break
 
-                        # Esperar un tiempo aleatorio para imitar el comportamiento humano
                         time.sleep(random.uniform(1, 2))
 
                     except Exception as e:
@@ -289,6 +215,7 @@ def home(request):
                         break
 
                 return historias
+
             except Exception as e:
                 print(f"No se pudieron obtener historias para {usuario}: {str(e)}")
                 return []
@@ -300,14 +227,10 @@ def home(request):
         print("Usuarios con historias coincidentes:", results["coinciden"])
         print("Usuarios sin historias coincidentes:", results["no_coinciden"])
 
-        # Eliminar la imagen de prueba
-        print("Eliminando imagen de prueba...")
-        os.remove("test/test.jpg")
-
         print("Fin del Programa")
 
         # Espera un tiempo aleatorio antes de cerrar el navegador
-        time.sleep(random.uniform(10, 15))
+        time.sleep(random.uniform(2, 8))
 
         # Cerrar el navegador
         driver.quit()
