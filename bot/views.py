@@ -16,6 +16,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -75,11 +76,15 @@ def home(request):
         chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
         chrome_options.add_experimental_option("useAutomationExtension", False)
 
+        # Capabilities que se enviarán al servidor Selenium Grid
+        capabilities = DesiredCapabilities.CHROME.copy()
+        capabilities.update(chrome_options.to_capabilities())
+
         # Configuración del servicio de ChromeDriver
         service = Service(executable_path=PATH)
 
         # Inicializa el driver de Chrome con el servicio configurado
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver = webdriver.Chrome(options=chrome_options)
 
         # Abre Instagram
         driver.get("https://www.instagram.com/")
