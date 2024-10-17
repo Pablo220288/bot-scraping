@@ -1,8 +1,8 @@
 import io
 import math
 import operator
+import os
 import random
-import ssl
 import time
 from functools import reduce
 
@@ -266,8 +266,19 @@ def home(request):
         # Crear una instancia de Instaloader
         L = instaloader.Instaloader()
 
-        # Iniciar sesión
-        L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
+        # Cargar cookies desde el archivo si existen
+        session_file = f"{INSTAGRAM_USER}_session"
+        if os.path.exists(session_file):
+            try:
+                L.load_session_from_file(INSTAGRAM_USER, session_file=session_file)
+                print(f"Sesión cargada desde {session_file}")
+            except Exception as e:
+                print(f"Error al cargar las cookies: {e}")
+        else:
+            # Iniciar sesión y guardar cookies si no existen
+            L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
+            L.save_session_to_file(session_file=session_file)
+            print(f"Sesión guardada en {session_file}")
 
         # Esperar hasta que la sesión haya iniciado
         time.sleep(random.uniform(2, 5))
