@@ -1,8 +1,8 @@
 import io
 import math
 import operator
-import os
 import random
+import ssl
 import time
 from functools import reduce
 
@@ -111,18 +111,38 @@ def logout_view(request):
             print(f"Imagen descargada en memoria.")
             return image_bytes
 
+        def rmsdiff(im1, im2):
+
+            diff = ImageChops.difference(im1, im2)
+            h = diff.histogram()
+
+            # Calcular la raíz cuadrada de la media de las diferencias cuadradas
+            rms = math.sqrt(
+                reduce(operator.add, (h * (i**2) for i, h in enumerate(h)))
+                / (float(im1.size[0]) * im1.size[1])
+            )
+            return rms
+
         def compare_images(image_bytes):
             # Cargar las imágenes desde la memoria
-            test_image = Image.open(test_image_bytes)
-            img_to_compare = Image.open(image_bytes)
+            test_image = Image.open(test_image_bytes).convert(
+                "L"
+            )  # Convertir a escala de grises
+            img_to_compare = Image.open(image_bytes).convert(
+                "L"
+            )  # Convertir a escala de grises
 
-            # Convertir las imágenes a arrays numpy
-            np_test_image = np.array(test_image)
-            np_img_to_compare = np.array(img_to_compare)
+            # Redimensionar a un tamaño fijo
+            test_image = test_image.resize((256, 256))
+            img_to_compare = img_to_compare.resize((256, 256))
 
-            # Comparar las matrices
-            if np.array_equal(np_test_image, np_img_to_compare):
-                print("Las imágenes son iguales.")
+            # Calcular la diferencia RMS
+            rms_difference = rmsdiff(test_image, img_to_compare)
+            print(f"Diferencia RMS: {rms_difference}")
+
+            # Establecer un umbral para considerar las imágenes "iguales"
+            if rms_difference < 10:  # Ajusta el umbral según sea necesario
+                print("Las imágenes son lo suficientemente similares.")
                 return True
             else:
                 print("Las imágenes son diferentes.")
@@ -266,19 +286,17 @@ def home(request):
         # Crear una instancia de Instaloader
         L = instaloader.Instaloader()
 
-        # Cargar cookies desde el archivo si existen
-        session_file = f"{INSTAGRAM_USER}_session"
-        if os.path.exists(session_file):
-            try:
-                L.load_session_from_file(INSTAGRAM_USER, session_file=session_file)
-                print(f"Sesión cargada desde {session_file}")
-            except Exception as e:
-                print(f"Error al cargar las cookies: {e}")
-        else:
-            # Iniciar sesión y guardar cookies si no existen
+        # Intentar cargar la sesión guardada
+        session_file = f"./{INSTAGRAM_USER}_session"
+        try:
+            L.load_session_from_file(INSTAGRAM_USER, session_file)
+            print(f"Sesión cargada desde el archivo {session_file}.")
+        except FileNotFoundError:
+            # Si no existe un archivo de sesión, iniciar sesión normalmente y guardar la sesión
+            print(f"No se encontró el archivo de sesión. Iniciando sesión con usuario y contraseña.")
             L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
-            L.save_session_to_file(session_file=session_file)
-            print(f"Sesión guardada en {session_file}")
+            L.save_session_to_file(session_file)
+            print(f"Sesión guardada en {session_file}.")
 
         # Esperar hasta que la sesión haya iniciado
         time.sleep(random.uniform(2, 5))
