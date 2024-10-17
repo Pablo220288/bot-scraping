@@ -19,6 +19,9 @@
             </li>
         {% endfor %}
     {% endif %}
+    {% if error %}
+      <p>{{ error }}: <a href="{{ checkpoint_url }}" target="_blank">Completar checkpoint</a></p>
+    {% endif %}
 
     <a class="icon-close"  href="{% url 'logout' %}">
         <ion-icon  name="close"></ion-icon>

@@ -15,6 +15,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from instaloader.exceptions import CheckpointRequiredException
 from PIL import Image, ImageChops
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -275,10 +276,40 @@ def home(request):
             except Exception as e:
                 print(f"Error al cargar las cookies: {e}")
         else:
-            # Iniciar sesión y guardar cookies si no existen
-            L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
-            L.save_session_to_file(session_file=session_file)
-            print(f"Sesión guardada en {session_file}")
+            try:
+                # Iniciar sesión y manejar el checkpoint si se presenta
+                L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
+                L.save_session_to_file(session_file=session_file)
+                print(f"Sesión guardada en {session_file}")
+
+            except CheckpointRequiredException as e:
+                # Captura del checkpoint y generación del enlace
+                checkpoint_url = (
+                    f"https://www.instagram.com/{e.context['challenge_url']}"
+                )
+                print(
+                    f"Se requiere verificación. Ve a este enlace para completar el checkpoint: {checkpoint_url}"
+                )
+
+                # Espera manual hasta que el usuario complete el checkpoint
+                print(
+                    "Por favor, completa el checkpoint y luego presiona Enter para continuar..."
+                )
+                input()  # Pausa hasta que el usuario presione Enter
+
+                # Intentar cargar la sesión de nuevo después del checkpoint
+                try:
+                    L.load_session_from_file(INSTAGRAM_USER, session_file=session_file)
+                    print("Sesión cargada exitosamente después del checkpoint.")
+                except Exception as e:
+                    print(f"Error al cargar la sesión después del checkpoint: {e}")
+                    return render(
+                        request,
+                        "home.html",
+                        {
+                            "error": "Error al cargar la sesión después del checkpoint",
+                        },
+                    )
 
         # Esperar hasta que la sesión haya iniciado
         time.sleep(random.uniform(2, 5))
