@@ -1,8 +1,12 @@
 import io
+import math
+import operator
 import random
 import ssl
 import time
+from functools import reduce
 
+import instaloader
 import numpy as np
 import requests
 from django.contrib import messages
@@ -11,17 +15,14 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
-from PIL import Image
+from PIL import Image, ImageChops
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-
-# Create your views here.
 
 
 def index(request):
@@ -52,7 +53,7 @@ def logout_view(request):
 """ @login_required """
 
 
-def home(request):
+""" def home(request):
     if request.method == "POST":
         # Variables de entorno
         INSTAGRAM_USER = request.POST.get("user")
@@ -76,15 +77,11 @@ def home(request):
         chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
         chrome_options.add_experimental_option("useAutomationExtension", False)
 
-        # Capabilities que se enviarán al servidor Selenium Grid
-        capabilities = DesiredCapabilities.CHROME.copy()
-        capabilities.update(chrome_options.to_capabilities())
-
         # Configuración del servicio de ChromeDriver
         service = Service(executable_path=PATH)
 
         # Inicializa el driver de Chrome con el servicio configurado
-        driver = webdriver.Chrome(options=chrome_options)
+        driver = webdriver.Chrome(service=service, options=chrome_options)
 
         # Abre Instagram
         driver.get("https://www.instagram.com/")
@@ -239,6 +236,128 @@ def home(request):
 
         # Cerrar el navegador
         driver.quit()
+
+        return render(
+            request,
+            "home.html",
+            {
+                "results": results,
+                "coinciden": results["coinciden"],
+                "no_coinciden": results["no_coinciden"],
+            },
+        )
+
+    return render(request, "home.html") """
+
+
+def home(request):
+    if request.method == "POST":
+        # Variables de entorno
+        INSTAGRAM_USER = request.POST.get("user")
+        INSTAGRAM_PASSWORD = request.POST.get("password")
+        FILE = request.FILES.get("my_file")
+        USERSTOTEST = request.POST.get("usersToTest")
+
+        if FILE:
+            # Guardar la imagen de prueba en memoria
+            test_image_bytes = io.BytesIO(FILE.read())
+            print(f"Imagen de prueba cargada en memoria.")
+
+        # Crear una instancia de Instaloader
+        L = instaloader.Instaloader()
+
+        # Iniciar sesión
+        L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
+
+        # Esperar hasta que la sesión haya iniciado
+        time.sleep(random.uniform(2, 5))
+
+        # Lista de usuarios
+        usuarios = USERSTOTEST.split(",")
+        usuarios = [usuario.strip() for usuario in usuarios]
+
+        def download_image_to_memory(src):
+            response = requests.get(src)
+            image_bytes = io.BytesIO(response.content)
+            print(f"Imagen descargada en memoria.")
+            return image_bytes
+
+        def rmsdiff(im1, im2):
+
+            diff = ImageChops.difference(im1, im2)
+            h = diff.histogram()
+
+            # Calcular la raíz cuadrada de la media de las diferencias cuadradas
+            rms = math.sqrt(
+                reduce(operator.add, (h * (i**2) for i, h in enumerate(h)))
+                / (float(im1.size[0]) * im1.size[1])
+            )
+            return rms
+
+        def compare_images(image_bytes):
+            # Cargar las imágenes desde la memoria
+            test_image = Image.open(test_image_bytes).convert(
+                "L"
+            )  # Convertir a escala de grises
+            img_to_compare = Image.open(image_bytes).convert(
+                "L"
+            )  # Convertir a escala de grises
+
+            # Redimensionar a un tamaño fijo
+            test_image = test_image.resize((256, 256))
+            img_to_compare = img_to_compare.resize((256, 256))
+
+            # Calcular la diferencia RMS
+            rms_difference = rmsdiff(test_image, img_to_compare)
+            print(f"Diferencia RMS: {rms_difference}")
+
+            # Establecer un umbral para considerar las imágenes "iguales"
+            if rms_difference < 10:  # Ajusta el umbral según sea necesario
+                print("Las imágenes son lo suficientemente similares.")
+                return True
+            else:
+                print("Las imágenes son diferentes.")
+                return False
+
+        # Array para almacenar los resultados
+        results = {
+            "coinciden": [],
+            "no_coinciden": [],
+        }
+
+        def obtener_historias_y_comparar(usuario):
+            profile = instaloader.Profile.from_username(L.context, usuario)
+
+            try:
+                print(f"Obteniendo historias de {usuario}...")
+                for story in L.get_stories(userids=[profile.userid]):
+                    for item in story.get_items():
+                        # Descargar la imagen a la memoria
+                        if item.typename == "GraphStoryImage":  # Verificar si es imagen
+                            image_bytes = download_image_to_memory(item.url)
+
+                            # Comparar con la imagen de prueba
+                            if compare_images(image_bytes):
+                                results["coinciden"].append(usuario)
+                                print(
+                                    f"Historia coincidente encontrada para {usuario}."
+                                )
+                                return  # Dejar de buscar más historias para este usuario
+            except Exception as e:
+                print(f"No se pudieron obtener historias para {usuario}: {str(e)}")
+
+            # Si ninguna historia coincide, agregar al array de no coinciden
+            results["no_coinciden"].append(usuario)
+
+        # Procesar cada usuario
+        for usuario in usuarios:
+            obtener_historias_y_comparar(usuario)
+            print("Siguiente usuario...")
+
+        print("Usuarios con historias coincidentes:", results["coinciden"])
+        print("Usuarios sin historias coincidentes:", results["no_coinciden"])
+
+        print("Fin del Programa")
 
         return render(
             request,
