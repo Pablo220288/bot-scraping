@@ -1,0 +1,37 @@
+{% extends 'index.html' %} 
+
+{% block static %} 
+    {% load static %} 
+{% endblock static %} 
+
+{% block titleanddescription %}
+<title>Al Fortino Instagram Bot</title>
+<meta name="description" content="" />
+{% endblock titleanddescription %} 
+
+{% block content %}
+    <section class="home-section">
+        <div class="results-box">
+            <div class="result-hero">
+                <a class="icon-arrow"  href="{% url 'home' %}">
+                    <ion-icon name="arrow-undo-outline"></ion-icon>
+                </a>
+                <h1>Resultados</h1>
+            </div>
+            <div class="results">
+                <ul>
+                    <h2><span class="result-number">{{ num_coinciden }}</span>Coinciden</h2>
+                    {% for usuario in results.coinciden %}
+                        <li>{{ usuario }}</li>
+                    {% endfor %}
+                </ul>
+                <ul>
+                    <h2><span class="result-number">{{ num_no_coinciden }}</span>No Coinciden</h2>
+                    {% for usuario in results.no_coinciden %}
+                        <li>{{ usuario }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </section>
+{% endblock content %}

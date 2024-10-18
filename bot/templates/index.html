@@ -19,6 +19,8 @@
 
       <!-- Local CSS -->
       <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+      {% block css %} 
+      {% endblock css %}
     </head>
     <body>
       {% block content %}

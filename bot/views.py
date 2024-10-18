@@ -388,14 +388,19 @@ def home(request):
 
         print("Fin del Programa")
 
-        return render(
-            request,
-            "home.html",
-            {
-                "results": results,
-                "coinciden": results["coinciden"],
-                "no_coinciden": results["no_coinciden"],
-            },
-        )
+        # Contar los resultados
+        num_coinciden = len(results["coinciden"])
+        num_no_coinciden = len(results["no_coinciden"])
+
+        # Guardar resultados y conteo en la sesión
+        request.session['results'] = results
+        request.session['num_coinciden'] = num_coinciden
+        request.session['num_no_coinciden'] = num_no_coinciden
+        return redirect('result')
 
     return render(request, "home.html")
+
+
+def result(request):
+    results = request.session.get('results')  # Supongamos que guardas los resultados en la sesión
+    return render(request, "result.html", {"results": results})
