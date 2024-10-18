@@ -11,6 +11,15 @@
 
 {% block content %}
 <section class="home-section">
+  <div id="spiner" class="spiner">
+    <div class="spiner_inner">
+      <p class="text">Loding
+        <span>.</span>
+        <span>.</span>
+        <span>.</span>
+      </p>
+    </div>
+  </div>
   <div class="login-box login-box-home">
     {% if messages %} 
         {% for message in messages %}
@@ -27,7 +36,7 @@
         <ion-icon  name="close"></ion-icon>
     </a>
 
-    <form class="form-home" method="post" enctype="multipart/form-data">
+    <form class="form-home" method="post" id="form-home" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="hero-from">
         <img src="{% static 'accets/favicon.png' %}" alt="InstaBot" />
@@ -61,7 +70,7 @@
           </div>
         </div>
       </div>
-      <button type="submit">Check Matches</button>
+      <button id="button-home" type="submit">Check Matches</button>
     </form>
   </div>
 </section>

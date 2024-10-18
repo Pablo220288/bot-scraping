@@ -293,7 +293,9 @@ def home(request):
             print(f"Sesión cargada desde el archivo {session_file}.")
         except FileNotFoundError:
             # Si no existe un archivo de sesión, iniciar sesión normalmente y guardar la sesión
-            print(f"No se encontró el archivo de sesión. Iniciando sesión con usuario y contraseña.")
+            print(
+                f"No se encontró el archivo de sesión. Iniciando sesión con usuario y contraseña."
+            )
             L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
             L.save_session_to_file(session_file)
             print(f"Sesión guardada en {session_file}.")
@@ -356,7 +358,7 @@ def home(request):
 
         def obtener_historias_y_comparar(usuario):
             profile = instaloader.Profile.from_username(L.context, usuario)
-
+            time.sleep(random.uniform(2, 5))
             try:
                 print(f"Obteniendo historias de {usuario}...")
                 for story in L.get_stories(userids=[profile.userid]):
@@ -393,14 +395,16 @@ def home(request):
         num_no_coinciden = len(results["no_coinciden"])
 
         # Guardar resultados y conteo en la sesión
-        request.session['results'] = results
-        request.session['num_coinciden'] = num_coinciden
-        request.session['num_no_coinciden'] = num_no_coinciden
-        return redirect('result')
+        request.session["results"] = results
+        request.session["num_coinciden"] = num_coinciden
+        request.session["num_no_coinciden"] = num_no_coinciden
+        return redirect("result")
 
     return render(request, "home.html")
 
 
 def result(request):
-    results = request.session.get('results')  # Supongamos que guardas los resultados en la sesión
+    results = request.session.get(
+        "results"
+    )  # Supongamos que guardas los resultados en la sesión
     return render(request, "result.html", {"results": results})

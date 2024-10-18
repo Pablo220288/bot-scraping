@@ -14,6 +14,13 @@ button.addEventListener("click", function (event) {
   return false;
 });
 fileInput.addEventListener("change", function (event) {
-  console.log(this.value)
+  console.log(this.value);
   the_return.innerHTML = this.value;
+});
+
+const formHome = document.querySelector("#form-home");
+const spiner = document.querySelector("#spiner");
+
+formHome.addEventListener("submit", (event) => {
+  spiner.classList.add("spiner-show");
 });
