@@ -289,13 +289,18 @@ def home(request):
         # Intentar cargar la sesión guardada
         session_file = f"./{INSTAGRAM_USER}_session"
         try:
+            # Intentar cargar la sesión guardada
             L.load_session_from_file(INSTAGRAM_USER, session_file)
-            print(f"Sesión cargada desde el archivo {session_file}.")
+            print(f"Sesión cargada desde {session_file}.")
         except FileNotFoundError:
-            # Si no existe un archivo de sesión, iniciar sesión normalmente y guardar la sesión
-            print(
-                f"No se encontró el archivo de sesión. Iniciando sesión con usuario y contraseña."
-            )
+            # Si no se encuentra la sesión, iniciar sesión
+            print(f"Archivo de sesión no encontrado. Iniciando sesión.")
+            L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
+            L.save_session_to_file(session_file)
+            print(f"Sesión guardada en {session_file}.")
+        except instaloader.exceptions.LoginRequiredException:
+            # Si la sesión ha expirado
+            print(f"La sesión ha expirado. Iniciando sesión de nuevo.")
             L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
             L.save_session_to_file(session_file)
             print(f"Sesión guardada en {session_file}.")
