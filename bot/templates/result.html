@@ -20,13 +20,13 @@
             </div>
             <div class="results">
                 <ul>
-                    <h2><span class="result-number">{{ num_coinciden }}</span>Coinciden</h2>
+                    <h2>Coinciden:<span class="result-number">{{ num_coinciden }}</span></h2>
                     {% for usuario in results.coinciden %}
                         <li>{{ usuario }}</li>
                     {% endfor %}
                 </ul>
                 <ul>
-                    <h2><span class="result-number">{{ num_no_coinciden }}</span>No Coinciden</h2>
+                    <h2>No Coinciden:<span class="result-number">{{ num_no_coinciden }}</span></h2>
                     {% for usuario in results.no_coinciden %}
                         <li>{{ usuario }}</li>
                     {% endfor %}

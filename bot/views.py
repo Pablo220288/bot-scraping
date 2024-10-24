@@ -286,24 +286,79 @@ def home(request):
         # Crear una instancia de Instaloader
         L = instaloader.Instaloader()
 
+        # Crear una instancia de Instaloader
+        L = instaloader.Instaloader()
+
+        """
+        # Formaro con Session
         # Intentar cargar la sesión guardada
         session_file = f"./{INSTAGRAM_USER}_session"
         try:
-            # Intentar cargar la sesión guardada
             L.load_session_from_file(INSTAGRAM_USER, session_file)
             print(f"Sesión cargada desde {session_file}.")
         except FileNotFoundError:
             # Si no se encuentra la sesión, iniciar sesión
             print(f"Archivo de sesión no encontrado. Iniciando sesión.")
-            L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
-            L.save_session_to_file(session_file)
-            print(f"Sesión guardada en {session_file}.")
+            try:
+                L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
+                L.save_session_to_file(session_file)
+                print(f"Sesión guardada en {session_file}.")
+            except instaloader.exceptions.LoginException as e:
+                # Manejar si el login falla por cualquier motivo
+                if "challenge required" in str(e).lower():
+                    messages.error(
+                        request,
+                        "Instagram requiere verificación adicional. Por favor, contacta a los desarrolladores.",
+                    )
+                else:
+                    messages.error(
+                        request, "Error al iniciar sesión. Verifica tus credenciales."
+                    )
+                return render(request, "home.html")
         except instaloader.exceptions.LoginRequiredException:
             # Si la sesión ha expirado
             print(f"La sesión ha expirado. Iniciando sesión de nuevo.")
+            try:
+                L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
+                L.save_session_to_file(session_file)
+                print(f"Sesión guardada en {session_file}.")
+            except instaloader.exceptions.LoginException as e:
+                if "challenge required" in str(e).lower():
+                    messages.error(
+                        request,
+                        "Instagram requiere verificación adicional. Por favor, contacta a los desarrolladores.",
+                    )
+                else:
+                    messages.error(
+                        request, "Error al iniciar sesión. Verifica tus credenciales."
+                    )
+                return render(request, "home.html")
+        """
+
+        try:
+            # Intentar iniciar sesión
+            print("Iniciando sesión en Instagram...")
             L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
-            L.save_session_to_file(session_file)
-            print(f"Sesión guardada en {session_file}.")
+            print("Sesión iniciada con éxito.")
+        except instaloader.exceptions.BadCredentialsException:
+            # Error de credenciales incorrectas
+            messages.error(request, "Credenciales incorrectas. Inténtalo de nuevo.")
+            return redirect("home")
+        except instaloader.exceptions.TwoFactorAuthRequiredException:
+            # Error de autenticación de dos factores
+            messages.error(
+                request,
+                "Autenticación de dos factores requerida. Comuníquese con los desarrolladores.",
+            )
+            return redirect("home")
+        except Exception as e:
+            # Cualquier otro error inesperado, como desafíos de seguridad
+            print(f"Error inesperado durante el inicio de sesión: {str(e)}")
+            messages.error(
+                request,
+                "Hubo un problema al iniciar sesión. Comuníquese con los desarrolladores.",
+            )
+            return redirect("home")
 
         # Esperar hasta que la sesión haya iniciado
         time.sleep(random.uniform(2, 5))
@@ -387,6 +442,7 @@ def home(request):
 
         # Procesar cada usuario
         for usuario in usuarios:
+            time.sleep(random.uniform(1, 3))
             obtener_historias_y_comparar(usuario)
             print("Siguiente usuario...")
 
@@ -409,7 +465,13 @@ def home(request):
 
 
 def result(request):
-    results = request.session.get(
-        "results"
-    )  # Supongamos que guardas los resultados en la sesión
-    return render(request, "result.html", {"results": results})
+    results = request.session.get("results", {"coinciden": [], "no_coinciden": []})  
+    num_coinciden = request.session.get("num_coinciden", 0)  
+    num_no_coinciden = request.session.get("num_no_coinciden", 0) 
+
+    # Renderiza el template pasando los resultados y los números
+    return render(request, "result.html", {
+        "results": results,
+        "num_coinciden": num_coinciden,
+        "num_no_coinciden": num_no_coinciden
+    })

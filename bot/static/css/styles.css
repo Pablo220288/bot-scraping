@@ -286,6 +286,13 @@ section {
   }
 }
 
+.text-home{
+  color: #fefefea3;
+  font-size: 1em;
+  max-width: 320px;
+  text-align: center;
+}
+
 .login-box-home {
   animation: none !important;
   width: fit-content;
@@ -351,6 +358,7 @@ section {
   font-style: italic;
   font-size: 0.9em;
   font-weight: bold;
+  overflow-x: hidden;
 }
 .js .file-return:not(:empty):before {
   content: "Selected file: ";
@@ -451,12 +459,12 @@ textarea {
 .alert-warning .alert-link {
   color: #523e02;
 }
-.alert-danger {
+.alert-error {
   color: #842029;
   background-color: #f8d7da;
   border-color: #f5c2c7;
 }
-.alert-danger .alert-link {
+.alert-error .alert-link {
   color: #6a1a21;
 }
 .alert-light {
@@ -521,7 +529,7 @@ textarea {
       .result-number {
         font-size: 1.5em;
         font-weight: bold;
-        padding-right: 5px;
+        padding-left: 10px;
       }
       h2 {
         padding-bottom: 10px;

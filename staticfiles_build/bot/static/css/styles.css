@@ -43,6 +43,77 @@ section {
   }
 }
 
+.spiner {
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  height: 100vh;
+  background: #00000075;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.spiner-show {
+  display: flex;
+}
+
+.spiner_inner {
+  width: 300px;
+  text-align: center;
+}
+
+.spiner_inner .text {
+  font-family: "Pacifico", cursive;
+  font-size: 36px;
+  color: #fff;
+  padding-bottom: 30px;
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.48);
+  position: relative;
+}
+
+.spiner_inner .text span {
+  position: absolute;
+  bottom: 10px;
+  opacity: 0;
+  font-size: 60px;
+}
+
+/* Animación para cada uno de los tres puntos (span) */
+.spiner_inner .text span:nth-child(1) {
+  right: 170px; /* $right */
+  animation: dot 1.2s infinite ease-in 1s;
+}
+
+.spiner_inner .text span:nth-child(2) {
+  right: 145px; /* $right - 25 */
+  animation: dot 1.2s infinite ease-in 2s;
+}
+
+.spiner_inner .text span:nth-child(3) {
+  right: 120px; /* $right - 25 - 25 */
+  animation: dot 1.2s infinite ease-in 3s;
+}
+
+@keyframes dot {
+  0% {
+    bottom: 10px;
+    opacity: 0;
+  }
+  30% {
+    bottom: 0;
+    opacity: 1;
+  }
+  70% {
+    bottom: 0;
+    opacity: 1;
+  }
+  100% {
+    bottom: -10px;
+    opacity: 0;
+  }
+}
+
 .hero-from {
   width: 100%;
   display: flex;
@@ -215,6 +286,13 @@ section {
   }
 }
 
+.text-home{
+  color: #fefefea3;
+  font-size: 1em;
+  max-width: 320px;
+  text-align: center;
+}
+
 .login-box-home {
   animation: none !important;
   width: fit-content;
@@ -280,6 +358,7 @@ section {
   font-style: italic;
   font-size: 0.9em;
   font-weight: bold;
+  overflow-x: hidden;
 }
 .js .file-return:not(:empty):before {
   content: "Selected file: ";
@@ -380,12 +459,12 @@ textarea {
 .alert-warning .alert-link {
   color: #523e02;
 }
-.alert-danger {
+.alert-error {
   color: #842029;
   background-color: #f8d7da;
   border-color: #f5c2c7;
 }
-.alert-danger .alert-link {
+.alert-error .alert-link {
   color: #6a1a21;
 }
 .alert-light {
@@ -450,7 +529,7 @@ textarea {
       .result-number {
         font-size: 1.5em;
         font-weight: bold;
-        padding-right: 5px;
+        padding-left: 10px;
       }
       h2 {
         padding-bottom: 10px;

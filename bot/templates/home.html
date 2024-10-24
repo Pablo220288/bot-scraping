@@ -20,6 +20,7 @@
       </p>
     </div>
   </div>
+  <span class="text-home">Recuerde tener abierto si Instagram en otra ventana, logueado y activado</span>
   <div class="login-box login-box-home">
     {% if messages %} 
         {% for message in messages %}
@@ -27,9 +28,6 @@
               {{message}}
             </li>
         {% endfor %}
-    {% endif %}
-    {% if error %}
-      <p>{{ error }}: <a href="{{ checkpoint_url }}" target="_blank">Completar checkpoint</a></p>
     {% endif %}
 
     <a class="icon-close"  href="{% url 'logout' %}">
@@ -61,7 +59,7 @@
             <label><input type="radio" name="type-match" value="video" disabled/>Video</label>
           </div>
           <div class="input-file-container">  
-            <input class="input-file" id="my-file" name="my_file" type="file">
+            <input class="input-file" id="my-file" name="my_file" type="file" required>
             <label tabindex="0" for="my-file" class="input-file-trigger">Select a file...</label>
           </div>
           <p class="file-return"></p>
