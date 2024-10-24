@@ -356,7 +356,7 @@ def home(request):
             print(f"Error inesperado durante el inicio de sesión: {str(e)}")
             messages.error(
                 request,
-                "Hubo un problema al iniciar sesión. Comuníquese con los desarrolladores.",
+                "Hubo un problema al iniciar sesión. Cierre session en Instagram e iniciela de nuevo. Complete y acepte los check de inicio. Luego corra el bot. Si el problema persiste, contacta a los desarrolladores.",
             )
             return redirect("home")
 
@@ -465,13 +465,17 @@ def home(request):
 
 
 def result(request):
-    results = request.session.get("results", {"coinciden": [], "no_coinciden": []})  
-    num_coinciden = request.session.get("num_coinciden", 0)  
-    num_no_coinciden = request.session.get("num_no_coinciden", 0) 
+    results = request.session.get("results", {"coinciden": [], "no_coinciden": []})
+    num_coinciden = request.session.get("num_coinciden", 0)
+    num_no_coinciden = request.session.get("num_no_coinciden", 0)
 
     # Renderiza el template pasando los resultados y los números
-    return render(request, "result.html", {
-        "results": results,
-        "num_coinciden": num_coinciden,
-        "num_no_coinciden": num_no_coinciden
-    })
+    return render(
+        request,
+        "result.html",
+        {
+            "results": results,
+            "num_coinciden": num_coinciden,
+            "num_no_coinciden": num_no_coinciden,
+        },
+    )
