@@ -23,6 +23,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 def index(request):
@@ -53,12 +54,11 @@ def logout_view(request):
 """ @login_required """
 
 
-""" def home(request):
+def home(request):
     if request.method == "POST":
         # Variables de entorno
         INSTAGRAM_USER = request.POST.get("user")
         INSTAGRAM_PASSWORD = request.POST.get("password")
-        TYPE_MATCH = request.POST.get("type-match")
         FILE = request.FILES.get("my_file")
         USERSTOTEST = request.POST.get("usersToTest")
 
@@ -67,9 +67,6 @@ def logout_view(request):
             test_image_bytes = io.BytesIO(FILE.read())
             print(f"Imagen de prueba cargada en memoria.")
 
-        # Ruta al ChromeDriver (con extensión .exe en Windows)
-        PATH = "chromedriver/chromedriver.exe"
-
         chrome_options = Options()
         chrome_options.add_argument(
             "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
@@ -77,11 +74,10 @@ def logout_view(request):
         chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
         chrome_options.add_experimental_option("useAutomationExtension", False)
 
-        # Configuración del servicio de ChromeDriver
-        service = Service(executable_path=PATH)
-
-        # Inicializa el driver de Chrome con el servicio configurado
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        # Inicializa el driver de Chrome utilizando ChromeDriverManager
+        driver = webdriver.Chrome(
+            service=Service(ChromeDriverManager().install()), options=chrome_options
+        )
 
         # Abre Instagram
         driver.get("https://www.instagram.com/")
@@ -239,7 +235,8 @@ def logout_view(request):
                 return historias
 
             except Exception as e:
-                print(f"No se pudieron obtener historias para {usuario}: {str(e)}")
+                results["no_coinciden"].append(usuario)
+                print(f"No se pudieron obtener historias para {usuario}.")
                 return []
 
         for usuario in usuarios:
@@ -257,20 +254,69 @@ def logout_view(request):
         # Cerrar el navegador
         driver.quit()
 
-        return render(
-            request,
-            "home.html",
-            {
-                "results": results,
-                "coinciden": results["coinciden"],
-                "no_coinciden": results["no_coinciden"],
-            },
-        )
+        # Cargar los resultados en la aplicación
+        print("Fin del Programa")
 
-    return render(request, "home.html") """
+        # Contar los resultados
+        num_coinciden = len(results["coinciden"])
+        num_no_coinciden = len(results["no_coinciden"])
+
+        # Guardar resultados y conteo en la sesión
+        request.session["results"] = results
+        request.session["num_coinciden"] = num_coinciden
+        request.session["num_no_coinciden"] = num_no_coinciden
+        return redirect("result")
+
+    return render(request, "home.html")
 
 
-def home(request):
+"""
+    # Formaro con Session
+    # Intentar cargar la sesión guardada
+    session_file = f"./{INSTAGRAM_USER}_session"
+    try:
+        L.load_session_from_file(INSTAGRAM_USER, session_file)
+        print(f"Sesión cargada desde {session_file}.")
+    except FileNotFoundError:
+        # Si no se encuentra la sesión, iniciar sesión
+        print(f"Archivo de sesión no encontrado. Iniciando sesión.")
+        try:
+            L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
+            L.save_session_to_file(session_file)
+            print(f"Sesión guardada en {session_file}.")
+        except instaloader.exceptions.LoginException as e:
+            # Manejar si el login falla por cualquier motivo
+            if "challenge required" in str(e).lower():
+                messages.error(
+                    request,
+                    "Instagram requiere verificación adicional. Por favor, contacta a los desarrolladores.",
+                )
+            else:
+                messages.error(
+                    request, "Error al iniciar sesión. Verifica tus credenciales."
+                )
+            return render(request, "home.html")
+    except instaloader.exceptions.LoginRequiredException:
+        # Si la sesión ha expirado
+        print(f"La sesión ha expirado. Iniciando sesión de nuevo.")
+        try:
+            L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
+            L.save_session_to_file(session_file)
+            print(f"Sesión guardada en {session_file}.")
+        except instaloader.exceptions.LoginException as e:
+            if "challenge required" in str(e).lower():
+                messages.error(
+                    request,
+                    "Instagram requiere verificación adicional. Por favor, contacta a los desarrolladores.",
+                )
+            else:
+                messages.error(
+                    request, "Error al iniciar sesión. Verifica tus credenciales."
+                )
+            return render(request, "home.html")
+"""
+
+""" def home(request):
     if request.method == "POST":
         # Variables de entorno
         INSTAGRAM_USER = request.POST.get("user")
@@ -288,52 +334,6 @@ def home(request):
 
         # Crear una instancia de Instaloader
         L = instaloader.Instaloader()
-
-        """
-        # Formaro con Session
-        # Intentar cargar la sesión guardada
-        session_file = f"./{INSTAGRAM_USER}_session"
-        try:
-            L.load_session_from_file(INSTAGRAM_USER, session_file)
-            print(f"Sesión cargada desde {session_file}.")
-        except FileNotFoundError:
-            # Si no se encuentra la sesión, iniciar sesión
-            print(f"Archivo de sesión no encontrado. Iniciando sesión.")
-            try:
-                L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
-                L.save_session_to_file(session_file)
-                print(f"Sesión guardada en {session_file}.")
-            except instaloader.exceptions.LoginException as e:
-                # Manejar si el login falla por cualquier motivo
-                if "challenge required" in str(e).lower():
-                    messages.error(
-                        request,
-                        "Instagram requiere verificación adicional. Por favor, contacta a los desarrolladores.",
-                    )
-                else:
-                    messages.error(
-                        request, "Error al iniciar sesión. Verifica tus credenciales."
-                    )
-                return render(request, "home.html")
-        except instaloader.exceptions.LoginRequiredException:
-            # Si la sesión ha expirado
-            print(f"La sesión ha expirado. Iniciando sesión de nuevo.")
-            try:
-                L.login(INSTAGRAM_USER, INSTAGRAM_PASSWORD)
-                L.save_session_to_file(session_file)
-                print(f"Sesión guardada en {session_file}.")
-            except instaloader.exceptions.LoginException as e:
-                if "challenge required" in str(e).lower():
-                    messages.error(
-                        request,
-                        "Instagram requiere verificación adicional. Por favor, contacta a los desarrolladores.",
-                    )
-                else:
-                    messages.error(
-                        request, "Error al iniciar sesión. Verifica tus credenciales."
-                    )
-                return render(request, "home.html")
-        """
 
         try:
             # Intentar iniciar sesión
@@ -359,9 +359,6 @@ def home(request):
                 "Hubo un problema al iniciar sesión. Cierre session en Instagram e iniciela de nuevo. Complete y acepte los check de inicio. Luego corra el bot. Si el problema persiste, contacta a los desarrolladores.",
             )
             return redirect("home")
-
-        # Esperar hasta que la sesión haya iniciado
-        time.sleep(random.uniform(2, 5))
 
         # Lista de usuarios
         usuarios = USERSTOTEST.split(",")
@@ -461,7 +458,7 @@ def home(request):
         request.session["num_no_coinciden"] = num_no_coinciden
         return redirect("result")
 
-    return render(request, "home.html")
+    return render(request, "home.html") """
 
 
 def result(request):

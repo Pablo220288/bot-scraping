@@ -520,24 +520,37 @@ textarea {
     flex-direction: row;
     align-items: flex-start;
     gap: 100px;
+    .result-number {
+      font-size: 1.5em;
+      font-weight: bold;
+      padding-left: 10px;
+    }
+    h2 {
+      padding-bottom: 10px;
+      white-space: nowrap;
+    }
     ul {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 5px;
-      .result-number {
-        font-size: 1.5em;
-        font-weight: bold;
-        padding-left: 10px;
-      }
-      h2 {
-        padding-bottom: 10px;
-        white-space: nowrap;
-      }
+      max-height: 400px;
+      overflow-y: scroll;
+      padding-right: 20px;
       li {
         align-self: flex-start;
         list-style: none;
       }
+    }
+    ul::-webkit-scrollbar {
+      width: 0.35rem;
+      background-color: transparent;
+      border-radius: 10px;
+    }
+    ul::-webkit-scrollbar-thumb {
+      width: 0.5rem;
+      background-color: #000000;
+      border-radius: 10px;
     }
   }
 }
